@@ -247,6 +247,7 @@ export function FoodSymptomLogger() {
   const [draggedItem, setDraggedItem] = useState<DraggedItem | null>(null)
   const [showSeverityPicker, setShowSeverityPicker] = useState(false)
   const [pendingSymptom, setPendingSymptom] = useState<any>(null)
+  const [saveSuccess, setSaveSuccess] = useState(false)
   const { addMeal, addSymptom } = useAppStore()
 
   const handleDragStart = (item: any, type: 'food' | 'symptom') => {
@@ -346,6 +347,10 @@ export function FoodSymptomLogger() {
       addSymptom(symptomEntry)
     })
 
+    // Show success feedback
+    setSaveSuccess(true)
+    setTimeout(() => setSaveSuccess(false), 3000)
+
     // Reset form
     setLoggedFoods([])
     setLoggedSymptoms([])
@@ -354,23 +359,39 @@ export function FoodSymptomLogger() {
   }
 
   return (
-    <div className="min-h-screen bg-black p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-black p-4 md:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <motion.div
-          className="text-center"
+          className="text-center mb-8"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-4xl font-creative-heading font-bold text-white mb-2">
+          <h1 className="text-3xl md:text-4xl font-creative-heading font-bold text-white mb-3">
             Detailed Food & Symptom Logger
           </h1>
-          <p className="text-white/70 font-creative-body">
-            Drag foods and symptoms to track your digestive patterns with precision
+          <p className="text-white/70 font-creative-body text-base md:text-lg">
+            Drag and drop to track your digestive patterns with precision
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Success Message */}
+        <AnimatePresence>
+          {saveSuccess && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="fixed top-32 left-1/2 transform -translate-x-1/2 z-50"
+            >
+              <div className="bg-bio-green-400 text-black px-6 py-3 rounded-xl font-semibold shadow-lg">
+                ✓ Entry saved successfully!
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Food Library */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -383,15 +404,20 @@ export function FoodSymptomLogger() {
                 <h2 className="text-white font-semibold">Food Library</h2>
               </div>
               
-              <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+              <div className="grid grid-cols-2 gap-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 {foodLibrary.map((food) => (
-                  <DraggableItem
+                  <motion.div
                     key={food.id}
-                    item={food}
-                    type="food"
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                  />
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <DraggableItem
+                      item={food}
+                      type="food"
+                      onDragStart={handleDragStart}
+                      onDragEnd={handleDragEnd}
+                    />
+                  </motion.div>
                 ))}
               </div>
             </OrganicContainer>
@@ -484,15 +510,20 @@ export function FoodSymptomLogger() {
                 <h2 className="text-white font-semibold">Symptoms</h2>
               </div>
               
-              <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto">
+              <div className="grid grid-cols-1 gap-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 {symptomLibrary.map((symptom) => (
-                  <DraggableItem
+                  <motion.div
                     key={symptom.id}
-                    item={symptom}
-                    type="symptom"
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                  />
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <DraggableItem
+                      item={symptom}
+                      type="symptom"
+                      onDragStart={handleDragStart}
+                      onDragEnd={handleDragEnd}
+                    />
+                  </motion.div>
                 ))}
               </div>
             </OrganicContainer>

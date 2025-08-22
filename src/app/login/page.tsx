@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
+import { signIn, getSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from 'lucide-react'
 import { OrganicContainer } from '@/components/ui/OrganicContainer'
 import { OrganicButton } from '@/components/ui/OrganicButton'
@@ -18,18 +20,69 @@ export default function LoginPage() {
     confirmPassword: ''
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically handle authentication
-    console.log('Form submitted:', formData)
-    // Redirect to dashboard after successful login/signup
-    window.location.href = '/onboarding'
+    setLoading(true)
+    setError('')
+
+    try {
+      if (isLogin) {
+        // Sign in with credentials
+        const result = await signIn('credentials', {
+          email: formData.email,
+          password: formData.password,
+          redirect: false,
+        })
+
+        if (result?.error) {
+          setError('Invalid email or password')
+        } else {
+          // Check if user has completed onboarding
+          const session = await getSession()
+          if (session) {
+            router.push('/onboarding')
+          }
+        }
+      } else {
+        // Register new user
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+          })
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          setError(data.error || 'Registration failed')
+        } else {
+          // Auto-login after registration
+          await signIn('credentials', {
+            email: formData.email,
+            password: formData.password,
+            callbackUrl: '/onboarding'
+          })
+        }
+      }
+    } catch (error) {
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center">
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
       {/* Background particles */}
-      <CellularParticles count={15} className="opacity-20" />
+      <CellularParticles count={15} />
       
       {/* Custom cursor - removed green cursor */}
 
@@ -45,31 +98,101 @@ export default function LoginPage() {
         </span>
       </motion.button>
 
-      {/* Logo */}
-      <motion.div
-        className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <h1 className="text-3xl font-creative-heading font-bold text-white">
-          GutWise
-        </h1>
-      </motion.div>
+
+      {/* Floating organic shapes - animated background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{ 
+            x: [0, 100, 0],
+            y: [0, -50, 0],
+            rotate: [0, 180, 360],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-400/20 rounded-3xl filter blur-xl"
+        />
+        
+        <motion.div
+          animate={{ 
+            x: [0, -150, 0],
+            y: [0, 100, 0],
+            rotate: [0, -180, -360],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute top-3/4 right-1/4 w-48 h-48 bg-yellow-400/20 rounded-3xl filter blur-xl"
+        />
+        
+        <motion.div
+          animate={{ 
+            x: [0, 80, 0],
+            y: [0, -80, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute bottom-1/4 left-1/2 w-24 h-24 bg-green-400/20 rounded-2xl filter blur-lg"
+        />
+      </div>
 
       {/* Main content */}
       <motion.div
-        className="w-full max-w-md mx-auto px-4"
+        className="w-full max-w-md mx-auto px-4 relative"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-8">
+        {/* GutWise Logo above the box */}
+        <motion.h1 
+          className="font-creative-heading text-5xl md:text-6xl font-bold mb-6 text-white text-center"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ 
+            opacity: 1, 
+            y: 0,
+            textShadow: [
+              '0 0 20px rgba(0, 255, 136, 0.5)',
+              '0 0 40px rgba(139, 92, 246, 0.5)',
+              '0 0 20px rgba(0, 255, 136, 0.5)'
+            ]
+          }}
+          transition={{ 
+            duration: 4, 
+            repeat: Infinity,
+            delay: 0.2
+          }}
+        >
+          GutWise
+        </motion.h1>
+
+        {/* Animated glow background */}
+        <motion.div
+          className="absolute inset-0 -inset-x-4 -inset-y-4 bg-gradient-to-r from-bio-green-400/20 via-purple-500/20 to-blue-500/20 rounded-3xl filter blur-2xl"
+          animate={{
+            opacity: [0.3, 0.6, 0.3],
+            scale: [0.95, 1.05, 0.95],
+            rotate: [0, 5, -5, 0]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-8 relative z-10">
           <div className="space-y-6">
             {/* Header */}
-            <div className="text-center flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center">
               <motion.h2
-                className="text-3xl font-creative-heading font-bold text-white mb-3 text-center"
+                className="text-3xl font-creative-heading font-bold text-white mb-3 text-center w-full"
                 animate={{
                   textShadow: [
                     '0 0 10px rgba(0, 255, 136, 0.3)',
@@ -81,7 +204,7 @@ export default function LoginPage() {
               >
                 {isLogin ? 'Welcome Back' : 'Join GutWise'}
               </motion.h2>
-              <p className="text-white/70 text-center max-w-xs mx-auto">
+              <p className="text-white/70 text-center w-full">
                 {isLogin 
                   ? 'Continue your gut health journey' 
                   : 'Start your personalized gut health journey'
@@ -105,7 +228,7 @@ export default function LoginPage() {
                       placeholder="Full Name"
                       value={formData.name}
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      className="input-organic w-full pl-12"
+                      className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 backdrop-blur-md text-white placeholder-white/40 border border-white/20 focus:border-white/40 focus:bg-white/10 focus:outline-none transition-all duration-300"
                       required={!isLogin}
                     />
                   </div>
@@ -120,7 +243,7 @@ export default function LoginPage() {
                   placeholder="Email Address"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="input-organic w-full pl-12"
+                  className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 backdrop-blur-md text-white placeholder-white/40 border border-white/20 focus:border-white/40 focus:bg-white/10 focus:outline-none transition-all duration-300"
                   required
                 />
               </div>
@@ -133,7 +256,7 @@ export default function LoginPage() {
                   placeholder="Password"
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="input-organic w-full pl-12 pr-12"
+                  className="w-full pl-12 pr-12 py-4 rounded-2xl bg-white/5 backdrop-blur-md text-white placeholder-white/40 border border-white/20 focus:border-white/40 focus:bg-white/10 focus:outline-none transition-all duration-300"
                   required
                 />
                 <button
@@ -159,7 +282,7 @@ export default function LoginPage() {
                       placeholder="Confirm Password"
                       value={formData.confirmPassword}
                       onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      className="input-organic w-full pl-12"
+                      className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 backdrop-blur-md text-white placeholder-white/40 border border-white/20 focus:border-white/40 focus:bg-white/10 focus:outline-none transition-all duration-300"
                       required={!isLogin}
                     />
                   </div>
@@ -169,20 +292,31 @@ export default function LoginPage() {
               {/* Submit button */}
               <OrganicButton
                 type="submit"
-                variant="primary"
+                variant="outline"
                 size="lg"
                 shape="organic"
-                glow
-                className="w-full bg-transparent border-2 border-bio-green-400 text-white font-bold hover:bg-bio-green-400/10 px-8 py-4 rounded-xl"
+                disabled={loading}
+                className="w-full bg-white/10 border border-white/30 text-white font-bold hover:bg-white/20 hover:border-white/40 px-8 py-4 rounded-xl transition-all duration-300 disabled:opacity-50"
               >
                 <span className="flex items-center justify-center gap-2">
-                  {isLogin ? 'Sign In' : 'Create Account'}
-                  <ArrowRight size={18} />
+                  {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
+                  {!loading && <ArrowRight size={18} />}
                 </span>
               </OrganicButton>
             </form>
 
             {/* Toggle between login/signup */}
+            {/* Error Message */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm text-center"
+              >
+                {error}
+              </motion.div>
+            )}
+
             <div className="text-center">
               <button
                 type="button"
@@ -206,6 +340,7 @@ export default function LoginPage() {
                 <OrganicButton
                   variant="outline"
                   shape="organic"
+                  onClick={() => signIn('google')}
                   className="flex items-center justify-center gap-2 bg-transparent border-white/30 hover:bg-white/10 px-6 py-3 rounded-xl"
                 >
                   <span>🔍</span>
@@ -215,7 +350,8 @@ export default function LoginPage() {
                 <OrganicButton
                   variant="outline"
                   shape="organic"
-                  className="flex items-center justify-center gap-2 bg-transparent border-white/30 hover:bg-white/10 px-6 py-3 rounded-xl"
+                  disabled
+                  className="flex items-center justify-center gap-2 bg-transparent border-white/30 hover:bg-white/10 px-6 py-3 rounded-xl opacity-50"
                 >
                   <span>🍎</span>
                   <span className="whitespace-nowrap">Apple</span>
@@ -234,34 +370,6 @@ export default function LoginPage() {
         </div>
       </motion.div>
 
-      {/* Floating elements */}
-      <motion.div
-        className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-400/10 rounded-3xl filter blur-xl pointer-events-none"
-        animate={{
-          x: [0, 50, 0],
-          y: [0, -30, 0],
-          rotate: [0, 180, 360],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "linear"
-        }}
-      />
-      
-      <motion.div
-        className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-yellow-400/10 rounded-2xl filter blur-lg pointer-events-none"
-        animate={{
-          x: [0, -40, 0],
-          y: [0, 40, 0],
-          scale: [1, 1.2, 1],
-        }}
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          ease: "linear"
-        }}
-      />
     </div>
   )
 }

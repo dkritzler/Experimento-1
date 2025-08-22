@@ -4,8 +4,23 @@ export interface User {
   email: string
   name: string
   avatar?: string
-  preferences: UserPreferences
-  subscription: SubscriptionTier
+  preferences?: UserPreferences
+  subscription?: SubscriptionTier
+  profile?: UserProfile
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface UserProfile {
+  age?: number
+  gender?: 'male' | 'female' | 'other'
+  height?: number // in cm
+  weight?: number // in kg
+  dietaryRestrictions: string[]
+  allergies: string[]
+  healthGoals: string[]
+  microbiomeScore?: number
+  lastAnalysis?: Date
 }
 
 export interface UserPreferences {
@@ -157,6 +172,73 @@ export interface MicrobiomeRecommendation {
   type: 'probiotic' | 'prebiotic' | 'dietary' | 'lifestyle'
   description: string
   priority: 'low' | 'medium' | 'high'
+}
+
+// Additional Types for Backend Integration
+export interface Pattern {
+  id: string
+  userId: string
+  type: PatternType
+  trigger: string
+  response: string
+  confidence: number
+  occurrences: number
+  firstSeen: Date
+  lastSeen: Date
+}
+
+export type PatternType = 'correlation' | 'timing' | 'positive' | 'cycle'
+
+export interface Recipe {
+  id: string
+  title: string
+  description: string
+  imageUrl?: string
+  cookTime: number
+  servings: number
+  difficulty: 'Easy' | 'Medium' | 'Hard'
+  benefits: string[]
+  ingredients: string[]
+  instructions: string[]
+  gutHealthScore: number
+  tags: string[]
+}
+
+export interface Product {
+  id: string
+  name: string
+  brand?: string
+  type: ProductType
+  description: string
+  benefits: string[]
+  dosage?: string
+  price: number
+  rating: number
+  reviewCount?: number
+  link?: string
+}
+
+export type ProductType = 'probiotic' | 'prebiotic' | 'supplement' | 'food'
+
+export interface OnboardingData {
+  personalInfo: {
+    name: string
+    age: number
+    gender: 'male' | 'female' | 'other'
+    height: number
+    weight: number
+  }
+  healthInfo: {
+    conditions: string[]
+    medications: string[]
+    supplements: string[]
+  }
+  dietInfo: {
+    restrictions: string[]
+    allergies: string[]
+    preferences: string[]
+  }
+  goals: string[]
 }
 
 // UI & Visualization

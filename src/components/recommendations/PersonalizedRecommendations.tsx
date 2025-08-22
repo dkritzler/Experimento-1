@@ -331,7 +331,7 @@ function RecipeCard({ recipe, onSwipe }: { recipe: Recipe; onSwipe: (direction: 
   return (
     <motion.div
       ref={cardRef}
-      className="absolute w-80 h-96 cursor-grab active:cursor-grabbing"
+      className="absolute w-[350px] h-[450px] cursor-grab active:cursor-grabbing"
       drag="x"
       dragConstraints={{ left: -200, right: 200 }}
       dragElastic={0.2}
@@ -353,7 +353,7 @@ function RecipeCard({ recipe, onSwipe }: { recipe: Recipe; onSwipe: (direction: 
       <OrganicContainer 
         variant="organic" 
         glow 
-        className="w-full h-full overflow-hidden"
+        className="w-full h-full overflow-hidden bg-gradient-to-br from-white/10 to-white/5 border-white/20"
       >
         <div className="relative h-full flex flex-col">
           {/* Header with icon and score */}
@@ -420,26 +420,6 @@ function RecipeCard({ recipe, onSwipe }: { recipe: Recipe; onSwipe: (direction: 
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex justify-center gap-4 p-4">
-            <motion.button
-              className="w-12 h-12 rounded-full bg-enzyme-400/20 border-2 border-enzyme-400 flex items-center justify-center"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => onSwipe('left')}
-            >
-              <X size={20} className="text-enzyme-400" />
-            </motion.button>
-            
-            <motion.button
-              className="w-12 h-12 rounded-full bg-bio-green-400/20 border-2 border-bio-green-400 flex items-center justify-center"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => onSwipe('right')}
-            >
-              <Heart size={20} className="text-bio-green-400" />
-            </motion.button>
-          </div>
         </div>
       </OrganicContainer>
     </motion.div>
@@ -447,17 +427,26 @@ function RecipeCard({ recipe, onSwipe }: { recipe: Recipe; onSwipe: (direction: 
 }
 
 function ProbioticBubble({ probiotic, index }: { probiotic: Probiotic; index: number }) {
-
   const [isExpanded, setIsExpanded] = useState(false)
+  
+  // Better spacing for bubbles - more separated
+  const positions = [
+    { left: '10%', top: '15%' },
+    { left: '35%', top: '5%' },
+    { left: '60%', top: '12%' },
+    { left: '85%', top: '20%' },
+    { left: '5%', top: '55%' },
+    { left: '30%', top: '50%' },
+    { left: '55%', top: '60%' },
+    { left: '80%', top: '52%' },
+  ]
+  
+  const position = positions[index % positions.length]
 
   return (
     <motion.div
-      
       className="absolute cursor-pointer"
-      style={{
-        left: `${20 + (index * 25)}%`,
-        top: `${30 + Math.sin(index) * 20}%`,
-      }}
+      style={position}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ delay: index * 0.2 }}
@@ -476,9 +465,9 @@ function ProbioticBubble({ probiotic, index }: { probiotic: Probiotic; index: nu
           ease: "easeInOut"
         }}
       >
-        {/* Bubble */}
+        {/* Bubble - Larger and more separated */}
         <motion.div
-          className="w-20 h-20 rounded-full bg-gradient-to-br from-probiotic-400 to-bio-green-400 flex items-center justify-center"
+          className="w-28 h-28 rounded-full bg-gradient-to-br from-probiotic-400 to-bio-green-400 flex items-center justify-center shadow-xl border-2 border-white/20"
           animate={{
             borderRadius: [
               '50%',
@@ -493,7 +482,7 @@ function ProbioticBubble({ probiotic, index }: { probiotic: Probiotic; index: nu
             ease: "easeInOut"
           }}
         >
-          <Zap size={24} className="text-white" />
+          <Zap size={28} className="text-white" />
         </motion.div>
 
         {/* Rating stars */}
@@ -502,12 +491,12 @@ function ProbioticBubble({ probiotic, index }: { probiotic: Probiotic; index: nu
           <span className="text-white text-xs font-bold">{probiotic.rating}</span>
         </div>
 
-        {/* Label */}
-        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-center">
-          <div className="text-xs text-white/70 font-space whitespace-nowrap">
+        {/* Label - Better visibility */}
+        <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-center">
+          <div className="text-sm text-white font-semibold whitespace-nowrap">
             {probiotic.name}
           </div>
-          <div className="text-xs text-white/50">
+          <div className="text-xs text-bio-green-400 font-bold mt-1">
             ${probiotic.price}
           </div>
         </div>
@@ -640,19 +629,21 @@ export function PersonalizedRecommendations() {
         <OrganicContainer variant="organic" size="sm">
           <div className="flex gap-2">
             <OrganicButton
-              variant={activeTab === 'recipes' ? 'primary' : 'ghost'}
+              variant={activeTab === 'recipes' ? 'outline' : 'ghost'}
               size="sm"
               shape="organic"
               onClick={() => setActiveTab('recipes')}
+              className={activeTab === 'recipes' ? 'bg-white/10 border-white/30 text-white' : 'text-white/60'}
             >
               <ChefHat size={16} className="mr-2" />
               Recipes
             </OrganicButton>
             <OrganicButton
-              variant={activeTab === 'probiotics' ? 'primary' : 'ghost'}
+              variant={activeTab === 'probiotics' ? 'outline' : 'ghost'}
               size="sm"
               shape="organic"
               onClick={() => setActiveTab('probiotics')}
+              className={activeTab === 'probiotics' ? 'bg-white/10 border-white/30 text-white' : 'text-white/60'}
             >
               <Zap size={16} className="mr-2" />
               Probiotics
@@ -671,7 +662,7 @@ export function PersonalizedRecommendations() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
           >
-            <div className="relative mb-8 flex items-center justify-center w-full max-w-md mx-auto">
+            <div className="relative flex items-center justify-center w-full h-[500px]">
               <AnimatePresence>
                 {currentRecipe && (
                   <RecipeCard 
@@ -683,18 +674,38 @@ export function PersonalizedRecommendations() {
               </AnimatePresence>
             </div>
 
-            {/* Instructions */}
+            {/* Save/Pass buttons at the bottom */}
             <motion.div
+              className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex items-center gap-8"
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1 }}
+              transition={{ delay: 0.8 }}
             >
-              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 px-6 py-3">
-                <div className="text-center text-white/70 text-sm space-y-1">
-                  <div>← Swipe left to pass</div>
-                  <div>→ Swipe right to save</div>
-                </div>
+              <OrganicButton
+                variant="outline"
+                size="lg"
+                shape="blob"
+                onClick={() => handleSwipe('left')}
+                className="bg-red-500/10 border-red-500/30 hover:bg-red-500/20 text-red-400"
+              >
+                <X size={20} className="mr-2" />
+                Pass
+              </OrganicButton>
+              
+              <div className="text-white/40 text-sm px-4">
+                or swipe
               </div>
+              
+              <OrganicButton
+                variant="outline"
+                size="lg"
+                shape="blob"
+                onClick={() => handleSwipe('right')}
+                className="bg-green-500/10 border-green-500/30 hover:bg-green-500/20 text-green-400"
+              >
+                <Heart size={20} className="mr-2" />
+                Save
+              </OrganicButton>
             </motion.div>
           </motion.div>
         )}
@@ -710,8 +721,8 @@ export function PersonalizedRecommendations() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
           >
-            {/* Centered probiotic bubbles container */}
-            <div className="relative w-full max-w-4xl h-96 mb-8">
+            {/* Centered probiotic bubbles container - Better layout */}
+            <div className="relative w-full max-w-5xl h-[500px] mx-auto">
               {mockProbiotics.map((probiotic, index) => (
                 <ProbioticBubble 
                   key={probiotic.id}
@@ -721,15 +732,16 @@ export function PersonalizedRecommendations() {
               ))}
             </div>
 
-            {/* Instructions */}
+            {/* Product selection hint at top */}
             <motion.div
-              initial={{ y: 50, opacity: 0 }}
+              className="absolute top-10 left-1/2 transform -translate-x-1/2"
+              initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1 }}
+              transition={{ delay: 0.8 }}
             >
-              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 px-6 py-3">
-                <div className="text-center text-white/70 text-sm">
-                  • Click bubbles to explore probiotics
+              <div className="bg-white/5 backdrop-blur-md rounded-full px-6 py-2 border border-white/10">
+                <div className="text-white/60 text-sm">
+                  Click any bubble to explore • {mockProbiotics.length} products available
                 </div>
               </div>
             </motion.div>

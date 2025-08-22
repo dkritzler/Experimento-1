@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { TimeSpiralLogger } from '@/components/logger/TimeSpiralLogger'
 import { FoodSymptomLogger } from '@/components/logger/FoodSymptomLogger'
+import { QuickMealLogger } from '@/components/meal/QuickMealLogger'
 
 import { FloatingNavigation } from '@/components/ui/FloatingNavigation'
 import { CellularParticles } from '@/components/ui/CellularParticles'
@@ -103,39 +104,46 @@ export default function LoggerPage() {
       {/* Floating navigation */}
       <FloatingNavigation />
 
-      {/* Tab Navigation */}
+      {/* Tab Navigation - Centered at top */}
       <motion.div
-        className="absolute top-6 left-6 z-30"
+        className="absolute top-20 left-1/2 transform -translate-x-1/2 z-30"
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        <OrganicContainer variant="organic" size="sm">
-          <div className="flex gap-2">
+        <OrganicContainer variant="organic" size="md" className="bg-white/10 backdrop-blur-lg border-white/20">
+          <div className="flex gap-3 p-1">
             <OrganicButton
               variant={activeTab === 'spiral' ? 'primary' : 'ghost'}
-              size="sm"
+              size="md"
               shape="organic"
               onClick={() => setActiveTab('spiral')}
+              className={activeTab === 'spiral' ? 'bg-bio-green-400 text-black' : 'text-white/70 hover:text-white'}
             >
-              <Clock size={16} className="mr-2" />
+              <Clock size={18} className="mr-2" />
               Time Spiral
             </OrganicButton>
             <OrganicButton
               variant={activeTab === 'detailed' ? 'primary' : 'ghost'}
-              size="sm"
+              size="md"
               shape="organic"
               onClick={() => setActiveTab('detailed')}
+              className={activeTab === 'detailed' ? 'bg-bio-green-400 text-black' : 'text-white/70 hover:text-white'}
             >
-              <PlusCircle size={16} className="mr-2" />
+              <PlusCircle size={18} className="mr-2" />
               Detailed Logger
             </OrganicButton>
           </div>
         </OrganicContainer>
       </motion.div>
       
-      {/* Main content */}
-      {activeTab === 'spiral' ? <TimeSpiralLogger /> : <FoodSymptomLogger />}
+      {/* Main content with proper spacing */}
+      <div className="pt-32">
+        {activeTab === 'spiral' ? <TimeSpiralLogger /> : <FoodSymptomLogger />}
+      </div>
+      
+      {/* Quick Meal Logger FAB */}
+      <QuickMealLogger />
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
+import { useSession } from 'next-auth/react'
 import type { 
   User, 
   Meal, 
@@ -32,6 +33,7 @@ interface AppState {
   // Actions
   setUser: (user: User | null) => void
   setLoading: (loading: boolean) => void
+  initializeFromSession: (sessionUser: any) => void
   addMeal: (meal: Meal) => void
   addSymptom: (symptom: Symptom) => void
   updateHealthScore: (score: HealthScore) => void
@@ -60,6 +62,21 @@ export const useAppStore = create<AppState>()(
         
         // Actions
         setUser: (user) => set({ user, isAuthenticated: !!user }, false, 'setUser'),
+        
+        // Updated to work with NextAuth
+        initializeFromSession: (sessionUser: any) => {
+          if (sessionUser) {
+            const user: User = {
+              id: sessionUser.id,
+              email: sessionUser.email,
+              name: sessionUser.name,
+              avatar: sessionUser.image,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }
+            set({ user, isAuthenticated: true }, false, 'initializeFromSession')
+          }
+        },
         
         setLoading: (isLoading) => set({ isLoading }, false, 'setLoading'),
         

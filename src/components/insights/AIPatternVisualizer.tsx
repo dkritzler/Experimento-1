@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import { Brain, MessageCircle, Send, TrendingUp, TrendingDown, AlertTriangle, X } from 'lucide-react'
+import { Brain, MessageCircle, Send, TrendingUp, TrendingDown, AlertTriangle, X, Sparkles } from 'lucide-react'
 import { OrganicContainer } from '@/components/ui/OrganicContainer'
 import { OrganicButton } from '@/components/ui/OrganicButton'
 
@@ -54,12 +54,15 @@ export function AIPatternVisualizer() {
     { role: 'assistant', message: chatResponses.greeting }
   ])
   const [inputMessage, setInputMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSendMessage = () => {
-    if (!inputMessage.trim()) return
+    if (!inputMessage.trim() || isLoading) return
     
     // Add user message
     const newMessages = [...chatMessages, { role: 'user', message: inputMessage }]
+    setChatMessages(newMessages)
+    setIsLoading(true)
     
     // Simple AI response logic
     let response = chatResponses.general
@@ -76,9 +79,9 @@ export function AIPatternVisualizer() {
     // Add AI response after a delay
     setTimeout(() => {
       setChatMessages([...newMessages, { role: 'assistant', message: response }])
+      setIsLoading(false)
     }, 1000)
     
-    setChatMessages(newMessages)
     setInputMessage('')
   }
 
@@ -131,24 +134,24 @@ export function AIPatternVisualizer() {
           className="absolute bottom-1/3 left-1/2 w-20 h-20 bg-yellow-400/8 rounded-full filter blur-md"
         />
       </div>
-      {/* Header */}
+      {/* Header - Properly centered */}
       <motion.div
-        className="absolute top-6 left-1/2 transform -translate-x-1/2 z-30 text-center"
+        className="fixed top-20 left-0 right-0 z-30 flex flex-col items-center justify-center"
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        <h1 className="text-3xl font-creative-heading font-bold text-white mb-2">
+        <h1 className="text-4xl font-creative-heading font-bold text-white mb-3">
           AI Health Insights
         </h1>
-        <p className="text-white/70 font-creative-body text-base">
+        <p className="text-white/70 font-creative-body text-lg">
           Understanding your patterns with artificial intelligence
         </p>
       </motion.div>
 
-      {/* Main Content */}
-      <div className="absolute top-20 left-0 right-0 bottom-0 p-2">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-4 h-full">
+      {/* Main Content - Better centering and responsive layout */}
+      <div className="absolute top-32 left-0 right-0 bottom-0 p-4">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
           
           {/* Left Column - Health Metrics Chart */}
           <motion.div
@@ -156,9 +159,11 @@ export function AIPatternVisualizer() {
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-3 h-full">
-              <h3 className="text-xl font-creative-heading font-bold text-white mb-4 flex items-center gap-2">
-                <Brain className="text-bio-green-400" size={28} />
+            <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6 h-fit">
+              <h3 className="text-2xl font-creative-heading font-bold text-white mb-6 flex items-center gap-3">
+                <div className="w-10 h-10 bg-bio-green-400/20 rounded-xl flex items-center justify-center">
+                  <Brain className="text-bio-green-400" size={24} />
+                </div>
                 Health Score Dashboard
               </h3>
               
@@ -193,16 +198,24 @@ export function AIPatternVisualizer() {
                 ))}
               </div>
 
-              {/* Quick Stats */}
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                <div className="text-center p-3 bg-white/5 rounded-xl">
-                  <div className="text-2xl font-bold text-bio-green-400">23</div>
-                  <div className="text-white/60 text-sm">Insights Generated</div>
-                </div>
-                <div className="text-center p-3 bg-white/5 rounded-xl">
-                  <div className="text-2xl font-bold text-blue-400">89%</div>
-                  <div className="text-white/60 text-sm">Pattern Accuracy</div>
-                </div>
+              {/* Quick Stats - Better styling */}
+              <div className="mt-8 grid grid-cols-2 gap-4">
+                <motion.div 
+                  className="text-center p-4 bg-gradient-to-br from-bio-green-400/10 to-transparent rounded-xl border border-bio-green-400/20"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <div className="text-3xl font-bold text-bio-green-400">23</div>
+                  <div className="text-white/60 text-sm mt-1">Insights Generated</div>
+                </motion.div>
+                <motion.div 
+                  className="text-center p-4 bg-gradient-to-br from-blue-400/10 to-transparent rounded-xl border border-blue-400/20"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <div className="text-3xl font-bold text-blue-400">89%</div>
+                  <div className="text-white/60 text-sm mt-1">Pattern Accuracy</div>
+                </motion.div>
               </div>
             </div>
           </motion.div>
@@ -214,20 +227,23 @@ export function AIPatternVisualizer() {
             transition={{ delay: 0.6 }}
             className="space-y-4"
           >
-            {/* AI Insights */}
-            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-3">
-              <h3 className="text-lg font-creative-heading font-bold text-white mb-3">
+            {/* AI Insights - Better spacing */}
+            <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6 h-fit">
+              <h3 className="text-2xl font-creative-heading font-bold text-white mb-6 flex items-center gap-3">
+                <div className="w-10 h-10 bg-probiotic-400/20 rounded-xl flex items-center justify-center">
+                  <Sparkles className="text-probiotic-400" size={24} />
+                </div>
                 Pattern Recognition
               </h3>
               
-              <div className="space-y-2 max-h-96 overflow-y-auto">
+              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 {insights.map((insight, index) => (
                   <motion.div
                     key={index}
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.8 + index * 0.2 }}
-                    className="p-3 bg-white/5 rounded-lg border border-white/10"
+                    className="p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-300 cursor-pointer"
                   >
                     <div className="flex items-start gap-3">
                       <AlertTriangle size={20} className={insight.type === 'positive' ? 'text-green-400' : 'text-yellow-400'} />
@@ -251,20 +267,21 @@ export function AIPatternVisualizer() {
               </div>
             </div>
 
-            {/* Health Coach Chatbot */}
+            {/* Health Coach Chatbot Button - Better styling */}
             <motion.div
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 1 }}
+              className="mt-6"
             >
               <OrganicButton
                 variant="primary"
                 size="lg"
                 onClick={() => setShowChat(true)}
-                className="w-full justify-center"
+                className="w-full justify-center bg-gradient-to-r from-bio-green-400 to-probiotic-400 text-black font-semibold py-4 hover:shadow-lg hover:shadow-bio-green-400/30 transition-all duration-300"
               >
-                <MessageCircle size={20} />
-                Chat with Dr. Luna (AI Health Coach)
+                <MessageCircle size={20} className="mr-2" />
+                Chat with Dr. Luna - AI Health Coach
               </OrganicButton>
             </motion.div>
           </motion.div>
@@ -282,7 +299,7 @@ export function AIPatternVisualizer() {
             onClick={() => setShowChat(false)}
           >
             <motion.div
-              className="w-full max-w-lg mx-4 h-96"
+              className="w-full max-w-lg mx-4 h-[500px]"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
@@ -329,6 +346,21 @@ export function AIPatternVisualizer() {
                       </div>
                     </motion.div>
                   ))}
+                  {isLoading && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex justify-start"
+                    >
+                      <div className="max-w-xs px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20">
+                        <div className="flex gap-1">
+                          <span className="w-2 h-2 bg-bio-green-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                          <span className="w-2 h-2 bg-bio-green-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                          <span className="w-2 h-2 bg-bio-green-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
 
                 {/* Chat Input */}

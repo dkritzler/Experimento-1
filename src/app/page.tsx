@@ -81,7 +81,7 @@ export default function Home() {
             className="text-center max-w-4xl"
           >
             <motion.h1 
-              className="font-creative-heading text-6xl md:text-8xl font-bold mb-8 text-white"
+              className="font-creative-heading text-5xl sm:text-6xl md:text-8xl font-bold mb-8 text-white"
               animate={{ 
                 textShadow: [
                   '0 0 20px rgba(0, 255, 136, 0.5)',
@@ -98,7 +98,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="font-creative-body text-xl md:text-2xl text-white/80 mb-12 max-w-2xl mx-auto"
+              className="font-creative-body text-lg sm:text-xl md:text-2xl text-white/80 mb-12 max-w-2xl mx-auto px-4"
             >
               Unlock the secrets of your digestive health with AI-powered pattern detection. 
               Track, analyze, and optimize your gut microbiome like never before.
@@ -366,7 +366,7 @@ export default function Home() {
             className="max-w-4xl mx-auto text-center"
           >
             <motion.h2 
-              className="font-creative-heading text-5xl md:text-7xl font-bold mb-8 text-white"
+              className="font-creative-heading text-4xl sm:text-5xl md:text-7xl font-bold mb-8 text-white px-4"
               initial={{ y: 30, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8 }}
@@ -394,7 +394,7 @@ export default function Home() {
               initial={{ y: 30, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
+              className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-16 px-4"
             >
               <OrganicButton
                 variant="primary"

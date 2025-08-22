@@ -58,15 +58,17 @@ export function MicrobiomeDashboard() {
 
   const calculatePosition = (index: number, total: number, radius: number) => {
     const angle = (index / total) * 2 * Math.PI - Math.PI / 2
+    // Use index-based offset instead of random for consistent SSR
+    const jitter = ((index * 7) % 20) - 10
     return {
-      x: Math.cos(angle) * radius,
-      y: Math.sin(angle) * radius,
+      x: Math.cos(angle) * radius + jitter,
+      y: Math.sin(angle) * radius + jitter,
       angle
     }
   }
 
   const renderBacteriaColony = (bacteria: BacteriaProfile, index: number) => {
-    const radius = 150 + (bacteria.percentage * 3)
+    const radius = 200 + (bacteria.percentage * 4) // Increased radius for better spacing
     const position = calculatePosition(index, mockMicrobiomeData.bacteria.length, radius)
     const color = bacteriaColors[bacteria.type]
     
@@ -82,10 +84,13 @@ export function MicrobiomeDashboard() {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ 
           scale: 1, 
-          opacity: 1
+          opacity: 1,
+          y: [0, -5, 0]
         }}
         transition={{ 
-          delay: index * 0.1
+          scale: { delay: index * 0.15, duration: 0.5 },
+          opacity: { delay: index * 0.15, duration: 0.5 },
+          y: { duration: 3 + (index % 3), repeat: Infinity, ease: "easeInOut" }
         }}
         whileHover={{ scale: 1.2, zIndex: 10 }}
         onClick={() => setSelectedBacteria(bacteria)}
@@ -94,8 +99,8 @@ export function MicrobiomeDashboard() {
         <motion.div
           className="relative"
           style={{ 
-            width: bacteria.percentage * 2 + 20,
-            height: bacteria.percentage * 2 + 20,
+            width: bacteria.percentage * 2.5 + 30,
+            height: bacteria.percentage * 2.5 + 30,
           }}
         >
           {/* Main cell body */}
@@ -183,27 +188,31 @@ export function MicrobiomeDashboard() {
   }
 
   return (
-    <div className="relative w-full h-screen flex items-center justify-center">
-      {/* Central Information Hub */}
+    <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+      {/* Central Information Hub - Better positioning */}
       <motion.div
-
-        className="absolute z-20 w-48 h-48 flex items-center justify-center"
+        className="absolute z-20 w-56 h-56 flex items-center justify-center"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.8, type: "spring" }}
         whileHover={{ scale: 1.05 }}
       >
         <OrganicContainer 
           variant="microbiome" 
           glow 
           pulse 
-          className="w-full h-full flex flex-col items-center justify-center text-center"
+          className="w-full h-full flex flex-col items-center justify-center text-center bg-gradient-to-br from-bio-green-400/10 to-probiotic-400/10 border-2 border-bio-green-400/30"
         >
-          <Microscope size={32} className="text-bio-green-400 mb-2" />
-          <div className="text-xl font-clash font-bold text-white mb-1">
+          <div className="w-12 h-12 bg-bio-green-400/20 rounded-full flex items-center justify-center mb-3">
+            <Microscope size={28} className="text-bio-green-400" />
+          </div>
+          <div className="text-2xl font-clash font-bold text-white mb-2">
             Microbiome
           </div>
-          <div className="text-lg font-bold text-bio-green-400 mb-1">
+          <div className="text-3xl font-bold text-bio-green-400 mb-2">
             {mockMicrobiomeData.diversity}%
           </div>
-          <div className="text-xs text-white/70">
+          <div className="text-sm text-white/70">
             Diversity Score
           </div>
         </OrganicContainer>
@@ -212,22 +221,27 @@ export function MicrobiomeDashboard() {
       {/* Background particles for living effect */}
       <MicrobiomeParticles count={30} />
 
-      {/* Concentric rings */}
-      {[1, 2, 3].map((ring) => (
+      {/* Concentric rings - Better visibility */}
+      {[1, 2, 3, 4].map((ring) => (
         <motion.div
           key={ring}
-          className="absolute border border-white/10 rounded-full pointer-events-none"
+          className="absolute border rounded-full pointer-events-none"
           style={{
-            width: 200 + ring * 100,
-            height: 200 + ring * 100,
+            width: 250 + ring * 120,
+            height: 250 + ring * 120,
+            borderColor: `rgba(${ring % 2 === 0 ? '0, 255, 136' : '74, 144, 226'}, ${0.15 - ring * 0.03})`,
+            borderWidth: 2,
           }}
+          initial={{ opacity: 0, scale: 0.8 }}
           animate={{
+            opacity: 1,
+            scale: 1,
             rotate: ring % 2 === 0 ? 360 : -360,
-            scale: [1, 1.02, 1]
           }}
           transition={{
-            rotate: { duration: 20 + ring * 5, repeat: Infinity, ease: "linear" },
-            scale: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+            opacity: { duration: 1, delay: ring * 0.2 },
+            scale: { duration: 1, delay: ring * 0.2 },
+            rotate: { duration: 30 + ring * 10, repeat: Infinity, ease: "linear" },
           }}
         />
       ))}
